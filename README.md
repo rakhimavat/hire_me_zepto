@@ -9,7 +9,7 @@ Ever seen AI spit out a LinkedIn reply like "Hey Customer Name, I'm Agent Name..
 Built as a mock for Zepto Care (think quick grocery delivery drama). Enter a buggy AI draft, and BAM – it validates, fixes tone, blocks placeholders, and spits out a safe, human-sounding post. No more "tinyurl.com/ZeptoOops" disasters! 😂
 
 ## Live Demo Magic ✨
-- [Try it live!](https://yourusername.github.io/repo-name/) ← (Update this after GitHub Pages deploys)
+](https://rakhimavat.github.io/hire_me_zepto/)
 
 **Pro Tip:** Paste a broken draft like "Hey Customer Name..." and watch it transform into "Hi Rohan, sorry for the late delivery – DM us your order ID!" Pure gold.
 
