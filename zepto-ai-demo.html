@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zepto AI Reply Fix Demo</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@500,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2;
+      --color-surface: #fbfbf9;
+      --color-surface-2: #f1eee8;
+      --color-surface-offset: #ece8e1;
+      --color-border: #d6d0c7;
+      --color-divider: #e2ddd5;
+      --color-text: #221f1a;
+      --color-text-muted: #68645d;
+      --color-text-faint: #97938b;
+      --color-primary: #6c2bd9;
+      --color-primary-hover: #5b23b6;
+      --color-primary-soft: rgba(108,43,217,.08);
+      --color-success: #2f7d32;
+      --color-success-soft: rgba(47,125,50,.1);
+      --color-warning: #9a4d00;
+      --color-warning-soft: rgba(154,77,0,.1);
+      --color-error: #b42318;
+      --color-error-soft: rgba(180,35,24,.1);
+      --radius-sm: .45rem; --radius-md: .75rem; --radius-lg: 1rem; --radius-xl: 1.4rem; --radius-full: 999px;
+      --shadow-sm: 0 1px 2px rgba(33,30,24,.06);
+      --shadow-md: 0 12px 30px rgba(33,30,24,.08);
+      --shadow-lg: 0 24px 60px rgba(33,30,24,.12);
+      --font-body: 'Satoshi', system-ui, sans-serif;
+      --font-display: 'Cabinet Grotesk', 'Satoshi', system-ui, sans-serif;
+    }
+    [data-theme="dark"] {
+      --color-bg: #13110f;
+      --color-surface: #1b1815;
+      --color-surface-2: #221f1b;
+      --color-surface-offset: #2b2722;
+      --color-border: #39342d;
+      --color-divider: #2b2722;
+      --color-text: #f4efe8;
+      --color-text-muted: #b2aca5;
+      --color-text-faint: #7f786f;
+      --color-primary: #b48cff;
+      --color-primary-hover: #c4a5ff;
+      --color-primary-soft: rgba(180,140,255,.12);
+      --color-success: #74d67a;
+      --color-success-soft: rgba(116,214,122,.12);
+      --color-warning: #ffb86b;
+      --color-warning-soft: rgba(255,184,107,.12);
+      --color-error: #ff7f73;
+      --color-error-soft: rgba(255,127,115,.12);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.2);
+      --shadow-md: 0 12px 30px rgba(0,0,0,.25);
+      --shadow-lg: 0 24px 60px rgba(0,0,0,.35);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;background:radial-gradient(circle at top right, var(--color-primary-soft), transparent 28%), var(--color-bg);color:var(--color-text)}
+    h1,h2,h3,p{margin:0}
+    button,input,textarea,select{font:inherit}
+    .shell{min-height:100vh}
+    .container{width:min(1180px, calc(100% - 2rem));margin:0 auto}
+    .topbar{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:color-mix(in srgb, var(--color-bg) 82%, transparent);border-bottom:1px solid var(--color-divider)}
+    .topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:var(--space-4) 0;gap:var(--space-4)}
+    .brand{display:flex;align-items:center;gap:var(--space-3);font-weight:700}
+    .logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg, #ff4d6d, #6c2bd9 60%);display:grid;place-items:center;box-shadow:var(--shadow-md)}
+    .logo svg{width:22px;height:22px;color:white}
+    .theme-btn,.ghost-btn,.primary-btn,.secondary-btn{border:none;border-radius:var(--radius-full);min-height:44px;padding:0 var(--space-5);cursor:pointer;transition:.18s ease}
+    .theme-btn,.ghost-btn,.secondary-btn{background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border)}
+    .primary-btn{background:var(--color-primary);color:white;box-shadow:var(--shadow-sm)}
+    .primary-btn:hover{background:var(--color-primary-hover);transform:translateY(-1px)}
+    .secondary-btn:hover,.ghost-btn:hover,.theme-btn:hover{background:var(--color-surface-2)}
+    .hero{padding:var(--space-12) 0 var(--space-10)}
+    .eyebrow{display:inline-flex;align-items:center;gap:.5rem;padding:.45rem .85rem;border-radius:var(--radius-full);background:var(--color-primary-soft);color:var(--color-primary);font-size:var(--text-sm);font-weight:700}
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:var(--space-8);align-items:center;margin-top:var(--space-6)}
+    .hero h1{font-family:var(--font-display);font-size:var(--text-2xl);line-height:1.02;letter-spacing:-.04em;max-width:10ch}
+    .hero-copy{display:grid;gap:var(--space-5)}
+    .hero-copy p{color:var(--color-text-muted);max-width:58ch}
+    .hero-actions{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .hero-card,.panel,.linkedin-card,.result-card,.metric,.validator-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-md)}
+    .hero-card{padding:var(--space-6);position:relative;overflow:hidden}
+    .mini-label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.14em;color:var(--color-text-faint);margin-bottom:var(--space-3)}
+    .comparison{display:grid;gap:var(--space-4)}
+    .bad-box,.good-box{padding:var(--space-4);border-radius:var(--radius-lg)}
+    .bad-box{background:var(--color-error-soft);border:1px solid rgba(180,35,24,.18)}
+    .good-box{background:var(--color-success-soft);border:1px solid rgba(47,125,50,.18)}
+    .bad-box h3,.good-box h3{font-size:var(--text-sm);margin-bottom:.4rem}
+    .section{padding:var(--space-8) 0}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:var(--space-8)}
+    .panel{padding:var(--space-6)}
+    .section-title{font-family:var(--font-display);font-size:var(--text-xl);letter-spacing:-.03em;margin-bottom:var(--space-2)}
+    .section-sub{color:var(--color-text-muted);margin-bottom:var(--space-6)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+    .field{display:grid;gap:.45rem}
+    .field.full{grid-column:1 / -1}
+    label{font-size:var(--text-sm);font-weight:700}
+    input,select,textarea{width:100%;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:.95rem 1rem;color:var(--color-text)}
+    textarea{min-height:130px;resize:vertical}
+    input:focus,select:focus,textarea:focus{outline:2px solid color-mix(in srgb, var(--color-primary) 42%, white);outline-offset:2px}
+    .actions{display:flex;gap:var(--space-3);margin-top:var(--space-5);flex-wrap:wrap}
+    .linkedin-card{padding:var(--space-5);display:grid;gap:var(--space-4)}
+    .linkedin-head{display:flex;align-items:center;gap:var(--space-3)}
+    .avatar{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#ff4d6d,#6c2bd9);display:grid;place-items:center;color:#fff;font-weight:800}
+    .linkedin-meta strong{display:block}
+    .linkedin-meta span{color:var(--color-text-muted);font-size:var(--text-sm)}
+    .linkedin-post{white-space:pre-wrap;background:var(--color-surface-2);border:1px solid var(--color-divider);padding:var(--space-4);border-radius:var(--radius-lg);min-height:210px}
+    .chips{display:flex;gap:.6rem;flex-wrap:wrap}
+    .chip{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .8rem;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:700;border:1px solid var(--color-border);background:var(--color-surface-2)}
+    .chip.pass{background:var(--color-success-soft);color:var(--color-success);border-color:rgba(47,125,50,.15)}
+    .chip.fail{background:var(--color-error-soft);color:var(--color-error);border-color:rgba(180,35,24,.15)}
+    .chip.warn{background:var(--color-warning-soft);color:var(--color-warning);border-color:rgba(154,77,0,.15)}
+    .validator-list{display:grid;gap:var(--space-3)}
+    .validator-card{padding:var(--space-4);display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-3)}
+    .validator-copy small{display:block;color:var(--color-text-muted);font-size:var(--text-sm)}
+    .status{font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.12em;padding:.45rem .65rem;border-radius:var(--radius-full)}
+    .status.pass{background:var(--color-success-soft);color:var(--color-success)}
+    .status.fail{background:var(--color-error-soft);color:var(--color-error)}
+    .status.warn{background:var(--color-warning-soft);color:var(--color-warning)}
+    .results{display:grid;gap:var(--space-4);margin-top:var(--space-5)}
+    .result-card{padding:var(--space-5)}
+    .result-card p{color:var(--color-text-muted)}
+    .result-text{margin-top:var(--space-3);white-space:pre-wrap;background:var(--color-surface-2);padding:var(--space-4);border-radius:var(--radius-lg);border:1px solid var(--color-divider);color:var(--color-text)}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-top:var(--space-5)}
+    .metric{padding:var(--space-4)}
+    .metric strong{display:block;font-size:var(--text-xl);font-family:var(--font-display)}
+    .metric span{display:block;color:var(--color-text-muted);font-size:var(--text-sm)}
+    .footer{padding:var(--space-10) 0 var(--space-12);color:var(--color-text-muted)}
+    .footer a{color:var(--color-primary)}
+    @media (max-width: 920px){
+      .hero-grid,.grid,.form-grid,.metrics{grid-template-columns:1fr}
+      .hero h1{max-width:14ch}
+    }
+    @media (max-width: 620px){
+      .container{width:min(100% - 1rem, 1180px)}
+      .hero{padding-top:var(--space-8)}
+      .panel,.hero-card,.linkedin-card,.result-card{padding:var(--space-4)}
+      .topbar-inner{padding:var(--space-3) 0}
+      .theme-btn,.ghost-btn,.primary-btn,.secondary-btn{width:100%;justify-content:center}
+      .hero-actions,.actions{display:grid}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-label="Demo logo">
+              <path d="M5 6h14L8 18h11" />
+            </svg>
+          </div>
+          <div>
+            <div>ReplyGuard Demo</div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:500;">Public product demo for smarter AI care replies</div>
+          </div>
+        </div>
+        <button class="theme-btn" data-theme-toggle aria-label="Switch theme">Toggle theme</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <div class="eyebrow">Live mockup · Broken reply in, validated reply out</div>
+            <h1>Fix brand-damaging AI support comments before they go live.</h1>
+            <p>This demo shows how a public support team can stop placeholder leaks, improve tone, and publish cleaner LinkedIn replies with deterministic validation layered on top of AI generation.</p>
+            <div class="hero-actions">
+              <a class="primary-btn" href="#demo" style="display:inline-flex;align-items:center;text-decoration:none;">Try the demo</a>
+              <button class="secondary-btn" id="loadBroken">Load broken Zepto-style example</button>
+            </div>
+          </div>
+          <div class="hero-card">
+            <div class="mini-label">Why this matters</div>
+            <div class="comparison">
+              <div class="bad-box">
+                <h3>What breaks trust</h3>
+                <div>“Hey (Customer Name), I’m (Agent Name)...”<br>Template variables leak into a public post, so the brand looks careless and over-automated.</div>
+              </div>
+              <div class="good-box">
+                <h3>What gets published instead</h3>
+                <div>“Hi Rohan, this isn’t the experience we want for you. I’m Aisha from Zepto Care, and I’d like to help.”</div>
+              </div>
+            </div>
+            <div class="metrics">
+              <div class="metric">
+                <strong id="metricChecks">4</strong>
+                <span>Validation layers</span>
+              </div>
+              <div class="metric">
+                <strong id="metricRisk">High</strong>
+                <span>Brand risk without guardrails</span>
+              </div>
+              <div class="metric">
+                <strong id="metricMode">Fallback</strong>
+                <span>Safe publish mode</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="demo">
+        <div class="container grid">
+          <div class="panel">
+            <h2 class="section-title">Generator inputs</h2>
+            <p class="section-sub">Enter customer context, simulate the broken AI draft, and watch the validation engine correct it.</p>
+            <div class="form-grid">
+              <div class="field">
+                <label for="customerName">Customer name</label>
+                <input id="customerName" value="Rohan" placeholder="Rohan" />
+              </div>
+              <div class="field">
+                <label for="agentName">Agent name</label>
+                <input id="agentName" value="Aisha" placeholder="Aisha" />
+              </div>
+              <div class="field">
+                <label for="issueType">Issue type</label>
+                <select id="issueType">
+                  <option value="late delivery">Late delivery</option>
+                  <option value="missing item">Missing item</option>
+                  <option value="wrong order">Wrong order</option>
+                  <option value="refund delay">Refund delay</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="channel">Support channel</label>
+                <select id="channel">
+                  <option value="DM us your order ID and registered number">LinkedIn DM</option>
+                  <option value="email us at care@brand.com with your order ID">Email</option>
+                  <option value="share your order details via our help form">Help form</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="complaint">Original complaint</label>
+                <textarea id="complaint">I placed an order and it arrived very late. No one from support updated me and the experience was frustrating.</textarea>
+              </div>
+              <div class="field full">
+                <label for="brokenDraft">Broken AI draft</label>
+                <textarea id="brokenDraft">Hey (Customer Name),
+
+I'm (Agent Name) from the Zepto team. This isn’t the experience we want for you, and we’re here to make it right.
+
+To help us look into this further, we’ll need your order details and contact number. To ensure confidentiality, you can drop us a message here https://tinyurl.com/ZeptoCares or email us at talktosocial@zepto.com. We’ll take it up from there and get this resolved.</textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="primary-btn" id="runDemo">Generate safer reply</button>
+              <button class="ghost-btn" id="clearNames">Simulate missing personalization</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2 class="section-title">Public reply preview</h2>
+            <p class="section-sub">The product treats AI output as a draft, not as a final post.</p>
+            <div class="linkedin-card">
+              <div class="linkedin-head">
+                <div class="avatar">Z</div>
+                <div class="linkedin-meta">
+                  <strong>Zepto Cares</strong>
+                  <span>81,872 followers · public comment preview</span>
+                </div>
+              </div>
+              <div class="chips" id="summaryChips"></div>
+              <div class="linkedin-post" id="previewText"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container grid">
+          <div class="panel">
+            <h2 class="section-title">Validation engine</h2>
+            <p class="section-sub">Each rule is deterministic, so the system can explain exactly why a reply is blocked or approved.</p>
+            <div class="validator-list" id="validatorList"></div>
+          </div>
+
+          <div class="panel">
+            <h2 class="section-title">Output router</h2>
+            <p class="section-sub">If the reply fails validation, the system falls back to a safe customer-facing response.</p>
+            <div class="results">
+              <div class="result-card">
+                <div class="mini-label">System decision</div>
+                <h3 id="decisionTitle">Blocked: unresolved placeholder detected</h3>
+                <p id="decisionCopy">The draft cannot be published as-is because it exposes internal template variables.</p>
+              </div>
+              <div class="result-card">
+                <div class="mini-label">Final approved reply</div>
+                <div class="result-text" id="finalReply"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container">Built as a mock public demo page for showcasing a better AI agent response workflow on LinkedIn.</div>
+    </footer>
+  </div>
+
+  <script>
+    const els = {
+      customerName: document.getElementById('customerName'),
+      agentName: document.getElementById('agentName'),
+      issueType: document.getElementById('issueType'),
+      channel: document.getElementById('channel'),
+      complaint: document.getElementById('complaint'),
+      brokenDraft: document.getElementById('brokenDraft'),
+      runDemo: document.getElementById('runDemo'),
+      clearNames: document.getElementById('clearNames'),
+      loadBroken: document.getElementById('loadBroken'),
+      previewText: document.getElementById('previewText'),
+      validatorList: document.getElementById('validatorList'),
+      finalReply: document.getElementById('finalReply'),
+      decisionTitle: document.getElementById('decisionTitle'),
+      decisionCopy: document.getElementById('decisionCopy'),
+      summaryChips: document.getElementById('summaryChips'),
+      metricMode: document.getElementById('metricMode'),
+      metricRisk: document.getElementById('metricRisk'),
+      themeToggle: document.querySelector('[data-theme-toggle]')
+    };
+
+    const placeholderRegex = /(\(\s*[A-Za-z _-]+\s*\))|(\{\{?\s*[A-Za-z0-9_.-]+\s*\}?\})|(insert name here)/gi;
+    const tinyUrlRegex = /tinyurl\.com|bit\.ly|t\.co|shorturl/gi;
+
+    function createDraft() {
+      return els.brokenDraft.value.trim();
+    }
+
+    function sentenceCase(text) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function generateSafeReply() {
+      const customer = els.customerName.value.trim();
+      const agent = els.agentName.value.trim();
+      const issue = els.issueType.value.trim();
+      const channel = els.channel.value.trim();
+      const opening = customer ? `Hi ${customer},` : 'Hi there,';
+      const agentLine = agent ? ` I’m ${agent} from Zepto Care.` : ' I’m part of the Zepto Care team.';
+      return `${opening}\n\nThis isn’t the experience we want for you.${agentLine} I’m sorry you had to deal with a ${issue}.\n\nPlease ${channel}, and we’ll look into this on priority and help get it resolved.`;
+    }
+
+    function validateReply(text) {
+      const results = [];
+      const placeholderFail = placeholderRegex.test(text);
+      placeholderRegex.lastIndex = 0;
+      results.push({
+        label: 'Placeholder detection',
+        ok: !placeholderFail,
+        detail: placeholderFail ? 'Blocked because unresolved template variables were found.' : 'No unresolved placeholders found.'
+      });
+
+      const hasCustomerFallback = text.startsWith('Hi ') || text.startsWith('Hello ');
+      results.push({
+        label: 'Personalization or fallback',
+        ok: hasCustomerFallback,
+        detail: hasCustomerFallback ? 'Reply has a usable opening even when customer data is missing.' : 'Opening line is missing or robotic.'
+      });
+
+      const shortLinkFail = tinyUrlRegex.test(text);
+      tinyUrlRegex.lastIndex = 0;
+      results.push({
+        label: 'Trustworthy contact CTA',
+        ok: !shortLinkFail,
+        detail: shortLinkFail ? 'Shortened links reduce trust in public support comments.' : 'CTA avoids suspicious short links.'
+      });
+
+      const genericFail = /we're here to make it right\.?$/i.test(text.trim()) || text.trim().length < 120;
+      results.push({
+        label: 'Specificity and tone',
+        ok: !genericFail,
+        detail: genericFail ? 'The draft is too generic and needs clearer accountability.' : 'Reply sounds specific, calm, and human.'
+      });
+
+      return results;
+    }
+
+    function renderValidators(results) {
+      els.validatorList.innerHTML = '';
+      results.forEach(result => {
+        const div = document.createElement('div');
+        div.className = 'validator-card';
+        div.innerHTML = `
+          <div class="validator-copy">
+            <strong>${result.label}</strong>
+            <small>${result.detail}</small>
+          </div>
+          <span class="status ${result.ok ? 'pass' : 'fail'}">${result.ok ? 'Pass' : 'Fail'}</span>
+        `;
+        els.validatorList.appendChild(div);
+      });
+    }
+
+    function renderChips(results, decision) {
+      const failCount = results.filter(r => !r.ok).length;
+      const passCount = results.length - failCount;
+      els.summaryChips.innerHTML = `
+        <span class="chip ${failCount ? 'fail' : 'pass'}">${failCount ? failCount + ' failing checks' : 'All checks passed'}</span>
+        <span class="chip ${passCount ? 'pass' : ''}">${passCount} passing checks</span>
+        <span class="chip ${decision.mode === 'fallback' ? 'warn' : 'pass'}">Mode: ${decision.mode}</span>
+      `;
+    }
+
+    function runDemo(useCurrentDraft = true) {
+      const draft = useCurrentDraft ? createDraft() : els.brokenDraft.value.trim();
+      els.previewText.textContent = draft;
+      const checks = validateReply(draft);
+      const hasFailures = checks.some(item => !item.ok);
+      const safeReply = generateSafeReply();
+
+      let decision;
+      if (hasFailures) {
+        decision = {
+          mode: 'fallback',
+          title: 'Blocked: validation failed',
+          copy: 'The AI draft is treated as unsafe for public posting, so the system switches to a safe fallback reply.'
+        };
+        els.finalReply.textContent = safeReply;
+      } else {
+        decision = {
+          mode: 'approved',
+          title: 'Approved: ready to publish',
+          copy: 'The response passed validation, so it can move into publishing or human review.'
+        };
+        els.finalReply.textContent = draft;
+      }
+
+      renderValidators(checks);
+      renderChips(checks, decision);
+      els.decisionTitle.textContent = decision.title;
+      els.decisionCopy.textContent = decision.copy;
+      els.metricMode.textContent = sentenceCase(decision.mode);
+      els.metricRisk.textContent = hasFailures ? 'High' : 'Low';
+    }
+
+    els.runDemo.addEventListener('click', () => runDemo(true));
+    els.clearNames.addEventListener('click', () => {
+      els.customerName.value = '';
+      els.agentName.value = '';
+      runDemo(true);
+    });
+    els.loadBroken.addEventListener('click', () => {
+      window.location.hash = 'demo';
+      els.customerName.value = 'Rohan';
+      els.agentName.value = 'Aisha';
+      els.issueType.value = 'late delivery';
+      els.channel.value = 'DM us your order ID and registered number';
+      els.brokenDraft.value = `Hey (Customer Name),\n\nI'm (Agent Name) from the Zepto team. This isn’t the experience we want for you, and we’re here to make it right.\n\nTo help us look into this further, we’ll need your order details and contact number. To ensure confidentiality, you can drop us a message here https://tinyurl.com/ZeptoCares or email us at talktosocial@zepto.com. We’ll take it up from there and get this resolved.`;
+      runDemo(true);
+    });
+
+    els.themeToggle.addEventListener('click', () => {
+      const root = document.documentElement;
+      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    runDemo(true);
+  </script>
+</body>
+</html>
