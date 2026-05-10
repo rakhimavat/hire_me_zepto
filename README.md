@@ -1,7 +1,7 @@
 # hire_me_zepto
 # 🚀 ReplyGuard Demo - AI's Bad Replies? Not on My Watch! 😎
 
-![Demo screenshot or logo here – add one for extra pizzazz]
+<img width="1138" height="476" alt="image" src="https://github.com/user-attachments/assets/aa488efc-2c7e-47b4-89fd-b3711327316e" />
 
 ## What's This Chaos? 🤯
 Ever seen AI spit out a LinkedIn reply like "Hey Customer Name, I'm Agent Name..."? Yeah, me too. This is a **hilarious-yet-useful demo** of *ReplyGuard*, a validation engine that catches brand-killing goofs in AI-generated support replies **before** they embarrass you publicly.
